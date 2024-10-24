@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.OpLocationMapper">
+    <insert id="insertBatch">
+        insert into op_location(
+        `id`,
+        `business_type`,
+        `created_at`,
+        `updated_at`,
+        `name`,
+        `operator_id`,
+        `address`,
+        `city`,
+        `province`,
+        `latitude`,
+        `longitude`,
+        `country`,
+        `time_zone`,
+        `zone_id`
+        )
+        values
+        <foreach collection="insertLocationList" item="it" separator=",">
+            (
+            #{it.id},
+            #{it.businessType},
+            #{it.createdAt},
+            #{it.updatedAt},
+            #{it.name},
+            #{it.operatorId},
+            #{it.address},
+            #{it.city},
+            #{it.province},
+            #{it.latitude},
+            #{it.longitude},
+            #{it.country},
+            #{it.timeZone},
+            #{it.zoneId}
+            )
+        </foreach>
+    </insert>
+    <select id="selectByName" parameterType="String" resultType="Long">
+        select id from op_location where name = #{name}
+    </select>
+
+    <update id="deleteByLocationId" parameterType="Long">
+        update op_location
+        set deleted = 1,deleted_time = REPLACE(unix_timestamp(current_timestamp(3)),'.','')
+        where id = #{id}
+    </update>
+
+    <select id="mapQuery" parameterType="com.autel.cloud.pile.base.bo.OpLocationMapQueryBO"
+            resultType="com.autel.cloud.pile.base.vo.OpLocationMapQueryVO">
+        select
+        a.id as id,
+        a.name as name,
+        a.id as stationId,
+        a.address as address,
+        a.longitude as longitude,
+        a.latitude as latitude,
+        b.announcement as announcement,
+        b.app_show as app_show,
+        a.operator_id as sellerId,
+        b.billing_rule as currencyType,
+        b.billing_rule as currencySign,
+        b.trans_power as transPower
+        from op_location a
+        LEFT join op_location_operation b on b.location_id =a.id AND b.deleted = 0
+        <where>
+            b.app_show = 1
+            AND a.deleted = 0
+            <if test="name != null  and name != '' ">and a.name like "%"#{name}"%"</if>
+            <if test="lowPower != null  and lowPower != '' ">and b.trans_power &gt;= #{lowPower}</if>
+            <if test="highPower != null  and highPower != '' ">and b.trans_power &lt;= #{highPower}</if>
+            <if test="isEable != null  and isEable == 0 ">and a.deleted = 1</if>
+            <if test="isEable != null  and isEable == 1 ">and a.deleted = 0</if>
+            <if test="status != null ">and a.status = #{status}</if>
+            <!--范围条件站点id-->
+            <if test="distanceStationIds != null and distanceStationIds.size()>0 ">and a.id in
+                <foreach item="item" index="index" collection="distanceStationIds" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <!--价格条件站点id-->
+            <if test="priceStationIds != null and priceStationIds.size()>0 ">and a.id in
+                <foreach item="item" index="index" collection="priceStationIds" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY #{orderBy}
+    </select>
+
+    <select id="selectByOperatorId" parameterType="java.lang.Long"
+            resultType="com.autel.cloud.pile.base.vo.OpLocationMapQueryVO">
+        select
+        a.id as id,
+        a.name as name,
+        a.id as stationId,
+        a.address as address,
+        a.longitude as longitude,
+        a.latitude as latitude,
+        b.announcement as announcement,
+        b.app_show as app_show,
+        a.operator_id as sellerId,
+        b.billing_rule as currencyType,
+        b.billing_rule as currencySign,
+        b.trans_power as transPower
+        from op_location a
+        LEFT join op_location_operation b on b.location_id =a.id AND b.deleted = 0
+        <where>
+            a.operator_id = #{operatorId}
+        </where>
+    </select>
+
+
+    <select id="getOperatorIdBySn" parameterType="java.lang.String" resultType="java.lang.String">
+        select t1.operator_id operatorId
+        from op_location t1
+        join op_location_evse t2 on t1.id = t2.`location_id`
+        where t2.`evse_sn`=#{evseSn}
+        AND t1.deleted = 0 AND t2.deleted = 0
+    </select>
+
+    <select id="getLocationByPileSnList" resultType="com.autel.cloud.pile.base.dto.OpLocationListDTO">
+        select
+        t2.`pile_sn` pileSn,
+        t1.id,
+        t1.country,
+        t1.latitude,
+        t1.longitude,
+        t1.`operator_id` operatorId,
+        t1.name locationName,
+        t1.time_zone timeZone
+        from
+        `op_location` t1 join `op_location_pile_evse` t2  on t1.id = t2.`location_id` AND t2.deleted = 0
+        where  t2.pile_sn in
+        <foreach collection="list" item="pileSn" index="index" open="(" close=")" separator=",">
+            #{pileSn}
+        </foreach>
+        AND t1.deleted = 0
+    </select>
+
+    <select id="getSellIdByPileSn" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+            t1.operator_id operatorId
+        FROM
+            op_location t1
+            JOIN op_location_pile_evse t2 ON t1.id = t2.`location_id`
+        WHERE
+            t2.`pile_sn` = #{evseSn}
+          AND t1.deleted = 0
+          AND t2.deleted = 0
+    </select>
+
+    <select id="getPileSnBySellId" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+            t2.pile_sn
+        FROM
+            op_location t1
+        JOIN op_location_pile_evse t2 ON t1.id = t2.`location_id`
+        WHERE
+              t1.operator_id = #{sellId}
+          AND t1.deleted = 0
+          AND t2.deleted = 0
+    </select>
+    <select id="getLocationInfo" resultType="com.autel.cloud.pile.base.vo.GetSellerInfoAndLocationInfoVO">
+        select
+           ol.id as locationId,
+           ol.name as locationName,
+           ol.operator_id as operatorId
+        from
+           op_location ol left join  op_location_evse ole on ol.id = ole.location_id
+        where ol.deleted = 0 and ole.deleted = 0 and ole.evse_sn = #{s}
+    </select>
+
+</mapper>

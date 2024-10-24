@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.OpEvseChargingThresholdMapper">
+    <update id="deleteByEvseId" parameterType="Long">
+        update op_evse_charging_threshold
+        set deleted = 1
+        where evse_id = #{id}
+    </update>
+
+    <update id="updateByEvseId" parameterType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpEvseChargingThresholdEntity">
+        update op_evse_charging_threshold
+        set updated_at = #{updatedAt}, deleted = #{deleted}, status = #{status}
+        , car_battery_current = #{carBatteryCurrent}, car_battery_voltage = #{carBatteryVoltage}, car_battery_temperature = #{carBatteryTemperature}
+        , evse_current = #{evseCurrent}, evse_voltage = #{evseVoltage}, evse_temperature = #{evseTemperature}, connector_current = #{connectorCurrent}
+        , connector_voltage = #{connectorVoltage}, connector_temperature = #{connectorTemperature}, auto_down_current = #{autoDownCurrent}
+        , auto_down_voltage = #{autoDownVoltage}, auto_down_temperature = #{autoDownTemperature}
+        where evse_id = #{id}
+    </update>
+</mapper>

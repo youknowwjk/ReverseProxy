@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        p {
+            margin: 0;
+        }
+
+        .container {
+            position: relative;
+            padding: 30px 26px;
+            background: #fff;
+            max-width: 1080px;
+            margin: auto;
+        }
+
+
+        .t-1 {
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+            line-height: 22px;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .c-1 {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.9);
+            line-height: 18px;
+        }
+
+        .b-info {
+            margin-top: 14px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .b-info .b-1 {
+            color: #000000;
+            line-height: 24px;
+            margin-bottom: 2px;
+        }
+
+
+        .table-info {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+
+        }
+
+        .table-list {
+            min-width: 800px;
+            width: 100%;
+            table-layout: fixed
+        }
+
+        table tr th {
+            background: #f7f8fb;
+            color: rgba(0, 0, 0, 0.9);
+
+        }
+
+        table tr th span {
+            display: inline-block;
+            width: 100%;
+            line-height: 20px;
+        }
+
+        table tr th:not(:last-of-type) span {
+            border-right: 1px solid #e5e5e5;
+        }
+
+        table tr th,
+        table tr td {
+            line-height: 16px;
+            padding: 8px 16px 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .table-bottom tr td {
+            padding: 8px 0 8px;
+        }
+
+        .bottom-tr td {
+            line-height: 16px;
+        }
+
+        .bottom-tr:not(:last-of-type) td {
+            padding-bottom: 8px;
+        }
+
+        .right-p > span,
+        .right-p {
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .other-fee > span {
+            padding-left: 20px;
+        }
+
+        .subtotal_box_line {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .subtotal_box_line div:first-child {
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body style="margin: 0;">
+<div class="container">
+    <img class="autel-logo" th:src="${autelLogo}"
+         src="https://s3.cn-northwest-1.amazonaws.com.cn/default.enetest/1570007484933443586-1563430574013796353-logo.png"
+         alt="" style="height: 32px;margin: 0px 0 30px;"/>
+    <div class="b-info">
+        <p class="b-1" id="billTo" th:text="${billTo}">发送给:</p>
+        <p class="b-1" id="customerName">
+            <span th:text="${subscribeCustomerName}">商户名称:</span>
+            <span th:text="${subscribeCustomerNameValue}">道通合创</span>
+        </p>
+        <p class="b-1" id="customerAddress">
+            <span th:text="${subscribeCustomerAddress}">商户地址:</span>
+            <span th:text="${subscribeCustomerAddressValue}">36 Harbor Park DrivePark DrivePort Washington, NY 11050</span>
+        </p>
+        <p class="b-1" id="customerCountryCode">
+            <span th:text="${subscribeCustomerCountryCode}">商户所处国家:</span>
+            <span th:text="${subscribeCustomerCountryCodeValue}">美国</span>
+        </p>
+        <p class="b-1" style="margin-top:14px;margin-bottom: 0;line-height: 32px;" id="vatNumber">
+        <p th:text="${helloCustomer}">尊敬的客户,您好!</p>
+        <p th:text="${subscribeReturnSuccessCheck}">
+            道通云订阅服务订单1750059964112318466以下商品已完成退货,商品已失效,退款金额会在2个工作日内退回至您的支付账户中（商户账号对应的租户名称）：</p>
+        </p>
+    </div>
+    <div class="v-line" style="width: 100%;
+        height: 2px;
+        background: rgba(0, 0, 0, 0.6);
+        margin: 16px 0 19px;"></div>
+    <div class="table-info">
+        <p class="table-title" style="font-size: 16px;
+            color: #000000;
+            line-height: 24px;
+            margin-bottom: 11px;width: 800px;font-weight: 600;">
+            <span style=" margin-right: 100px;" id="orderId" th:text="${subscribeOrderId}">订单编号:000001</span>
+            <span style=" margin-right: 26px;" id="paymentDate"
+                  th:text="${subscribePaymentDate}">付款日期:2023-03-23(UTC-4)</span>
+        </p>
+        <table aria-describedby="表头" class="table-list">
+            <tbody>
+            <tr class="item-wrapper">
+                <th class="p-0-16" style="width: '25%' ">
+                    <span id="commodityName" th:text="${subscribeCommodityName}">项目</span>
+                </th>
+                <th class="p-0-16" style="width: '15%' ">
+                    <span id="subscriptionDuration" th:text="${subscriptionDuration}">订阅周期</span>
+                </th>
+                <th class="p-0-16" style="width: '15%' ">
+                    <span id="portType" th:text="${subscribePortType}">充电桩/枪类型</span>
+                </th>
+                <th class="p-0-16" style=" width: '20%' ">
+                    <span id="quantity" th:text="${subscribeQuantity}">数量</span>
+                </th>
+                <th class="p-0-16" style=" width: 140px ">
+                    <span id="unitPrice" th:text="${licenseNumber}">许可证编号</span>
+                </th>
+                <th class="p-0-16" style=" width: 140px ">
+                    <span id="subTotal" th:text="${subscriptionReturnAmount}">退货金额</span>
+                </th>
+            </tr>
+
+            <tr class="t-li" id="orderDetail" th:each="orderDetail, stat : ${orderCommodityDetails}">
+                <td style="border-bottom: 1px solid #e5e5e5;" th:text="${orderDetail.commodityName}"></td>
+                <td style="border-bottom: 1px solid #e5e5e5;" th:text="${orderDetail.subscriptionDuration}"></td>
+                <td style="border-bottom: 1px solid #e5e5e5;" th:text="${orderDetail.portOrGunType}"></td>
+                <td style="border-bottom: 1px solid #e5e5e5;" th:text="${orderDetail.quantity}"></td>
+                <td style="border-bottom: 1px solid #e5e5e5;width: 100px" >
+                    <div th:each = "licenseCode : ${orderDetail.licenseCodeList}">
+                        <span th:text="${licenseCode}"></span>
+                    </div>
+                </td>
+                <td style="border-bottom: 1px solid #e5e5e5;width: 100px" th:if="${stat.first}"
+                    th:rowspan="${#lists.size(orderCommodityDetails)}"
+                    th:text="${currency} + ${orderDetail.subscriptionReturnAmount}"></td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <p style="color: #E64F46;line-height: 22px;margin-top: 16px;" th:text="${subscriptionQuestionsConsultation}">如对此订单有疑问,您可咨询您的销售代表</p>
+    <div class="v-line" style="width: 100%;height: 2px;background: rgba(0, 0, 0, 0.6);margin: 24px 0 17px;"></div>
+    <div class="footer-box"
+         style="margin-top: 26px;color: #000000;font-size: 14px; font-weight: 600; line-height: 24px;">
+        <p class="title"
+           id="company" th:text="${companyName}">Autel US Inc</p>
+        <p class="name" id="companyAddress" th:text="${companyAddr}">
+            36 Harbor Park Drive. PORT WASHINGTON NY 110550 USA
+        </p>
+
+    </div>
+</div>
+</body>
+
+</html>

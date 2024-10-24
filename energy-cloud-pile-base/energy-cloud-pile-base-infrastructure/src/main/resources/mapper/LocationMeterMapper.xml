@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.LocationMeterMapper">
+
+    <resultMap id="BaseResultMap" type="com.autel.cloud.pile.base.infrastructure.mapper.entity.LocationMeterEntity">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="createdAt" column="created_at" jdbcType="BIGINT"/>
+            <result property="updatedAt" column="updated_at" jdbcType="BIGINT"/>
+            <result property="deleted" column="deleted" jdbcType="TINYINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="version" column="version" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,created_at,updated_at,
+        deleted,name,version
+    </sql>
+</mapper>

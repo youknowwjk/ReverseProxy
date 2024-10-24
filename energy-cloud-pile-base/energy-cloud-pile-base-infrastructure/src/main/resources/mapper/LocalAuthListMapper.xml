@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.LocalAuthListMapper">
+
+    <insert id="batchSave">
+        insert into local_auth_list(
+        `id`,
+        `card`,
+        `status`,
+        `create_time`,
+        `update_time`,
+        `expired_time`,
+        `seller_id`,
+        `sn`
+        )
+        values
+        <foreach collection="insertList" item="it" separator=",">
+            (
+            #{it.id},
+            #{it.card},
+            #{it.status},
+            #{it.createTime},
+            #{it.updateTime},
+            #{it.expiredTime},
+            #{it.sellerId},
+            #{it.sn}
+            )
+        </foreach>
+    </insert>
+</mapper>

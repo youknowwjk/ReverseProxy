@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.OpImageMapper">
+
+    <update id="deleteByLocationId" parameterType="Long">
+        update op_image
+        set deleted = 1
+        where id = #{id}
+    </update>
+
+    <!--充电枪图片-->
+    <select id="selectEvseImgs" parameterType="java.util.List" resultType="java.util.Map">
+        SELECT oei.location_evse_id, oi.id, oi.created_at, oi.updated_at, oi.deleted, oi.status, oi.url, oi.thumbnail,
+        oi.`type`, oi.width, oi.height
+        FROM
+        energy_pile_base.op_evse_image oei
+        left join
+        energy_pile_base.op_image oi
+        on oei.image_id = oi.id AND oi.deleted = 0
+        WHERE oei.deleted = 0
+        AND oei.location_evse_id IN
+        <foreach collection="evseUidList" index="index" item="evseUid" open="(" close=")" separator=",">
+            #{evseUid}
+        </foreach>
+    </select>
+
+    <select id="getImagesByIds" parameterType="java.util.List" resultType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpImageEntity">
+        SELECT op_image.url, op_image.id
+        FROM
+        op_image
+        <where>
+            op_image.deleted = 0
+            AND op_image.id IN
+            <foreach collection="imageIds" index="index" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+</mapper>

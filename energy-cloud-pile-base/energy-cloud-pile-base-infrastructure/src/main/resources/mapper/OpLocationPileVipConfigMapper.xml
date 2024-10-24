@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.OpLocationPileVipConfigMapper">
+
+    <insert id="insertOrUpdate"
+            parameterType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpLocationPileVipConfigEntity">
+        INSERT INTO  `op_location_pile_vip_config`
+                    (`id`,
+                     `group_id`,
+                     `type`,
+                     `principal_id`,
+                     `effective_date`,
+                     `expiration_date`)
+        VALUES (#{id},
+                #{groupId},
+                #{type},
+                #{principalId},
+                #{effectiveDate},
+                #{expirationDate})
+                 ON DUPLICATE KEY UPDATE
+            `id` =VALUES (`id`),
+            `group_id` =VALUES (`group_id`),
+            `type`=VALUES (`type`),
+            `principal_id`=VALUES (`principal_id`),
+            `effective_date`=  #{effectiveDate},
+            `expiration_date`= #{expirationDate}
+    </insert>
+
+
+    <insert id="batchAddOrUpdate" parameterType="java.util.List">
+            INSERT INTO `op_location_pile_vip_config`
+            (`id`,
+            `group_id`,
+            `type`,
+            `principal_id`,
+            `effective_date`,
+            `expiration_date`)
+            values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.groupId},
+            #{item.type},
+            #{item.principalId},
+            #{item.effectiveDate},
+            #{item.expirationDate}
+            )
+        </foreach>
+            ON DUPLICATE KEY UPDATE
+            `id` =VALUES (`id`),
+            `group_id` =VALUES (`group_id`),
+            `type`=VALUES (`type`),
+            `principal_id`=VALUES (`principal_id`),
+            `effective_date`= VALUES (effective_date),
+            `expiration_date`=VALUES (expiration_date)
+
+    </insert>
+    <select id="findUse"
+            resultType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpLocationPileVipConfigEntity">
+        SELECT g.merchant_id as id, v.principal_id
+        FROM op_location_pile_group g
+                 LEFT JOIN op_location_pile_vip_config v ON g.id = v.group_id
+        WHERE g.deleted = 0
+          AND v.`type` = 1
+          AND v.id IS NOT NULL
+          AND g.merchant_id IS NOT NULL;
+    </select>
+
+
+</mapper>

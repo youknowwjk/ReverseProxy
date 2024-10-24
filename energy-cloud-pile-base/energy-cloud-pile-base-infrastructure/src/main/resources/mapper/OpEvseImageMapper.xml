@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.OpEvseImageMapper">
+    <update id="deleteByLocationEvseId" parameterType="Long">
+        update op_evse_image
+        set deleted = 1
+        where location_evse_id = #{id}
+    </update>
+    <update id="updateByLocationEvseId" parameterType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpEvseImageEntity">
+        update op_evse_image
+        set updated_at = #{updatedAt}, deleted = #{deleted}, status = #{status}, image_id = #{imageId}
+        where location_evse_id = #{id}
+    </update>
+</mapper>

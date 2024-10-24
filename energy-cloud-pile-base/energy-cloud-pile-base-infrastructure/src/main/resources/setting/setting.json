@@ -1,0 +1,50 @@
+{
+
+  "index": {
+    "max_ngram_diff": "30",
+    "refresh_interval": "1s",
+    "number_of_shards": "3",
+    "store": {
+      "type": "fs"
+    },
+    "analysis": {
+      "normalizer": {
+        "lowercase": {
+          "filter": [
+            "lowercase"
+          ],
+          "type": "custom"
+        }
+      },
+      "analyzer": {
+        "index_analyzer": {
+          "filter": [
+            "lowercase"
+          ],
+          "tokenizer": "my_tokenizer"
+        },
+        "search_analyzer": {
+          "filter": [
+            "lowercase"
+          ],
+          "tokenizer": "whitespace"
+        }
+      },
+      "tokenizer": {
+        "my_tokenizer": {
+          "token_chars": [
+            "letter",
+            "digit",
+            "punctuation",
+            "symbol"
+          ],
+          "min_gram": "1",
+          "type": "ngram",
+          "max_gram": "30"
+        }
+      }
+    },
+    "number_of_replicas": "1"
+  }
+
+}

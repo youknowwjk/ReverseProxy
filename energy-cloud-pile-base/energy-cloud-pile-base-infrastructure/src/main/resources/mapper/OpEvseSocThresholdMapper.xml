@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.OpEvseSocThresholdMapper">
+    <update id="deleteByEvseId" parameterType="Long">
+        update op_evse_soc_threshold
+        set deleted = 1
+        where evse_id = #{id}
+    </update>
+
+    <update id="updateByEvseId" parameterType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpEvseSocThresholdEntity">
+        update op_evse_soc_threshold
+        set updated_at = #{updatedAt}, deleted = #{deleted}, status = #{status}, seller_id = #{sellerId}
+        , lead_acid_battery = #{leadAcidBattery}, nickel_metal_hydride_battery = #{nickelMetalHydrideBattery}, fe_battery = #{feBattery}
+        , lithium_manganate_battery = #{lithiumManganateBattery}, lithium_cobalt_battery = #{lithiumCobaltBattery}
+        , ternary_material_battery = #{ternaryMaterialBattery}, polymer_lithium_battery = #{polymerLithiumBattery}
+        , lithium_titanate_battery = #{lithiumTitanateBattery}, other_battery = #{otherBattery}, soc_start_time = #{socStartTime}
+        , soc_finish_time = #{socFinishTime}, time_interval_soc = #{timeIntervalSoc}, vehicle_battery = #{vehicleBattery}
+        where evse_id = #{id}
+    </update>
+
+</mapper>

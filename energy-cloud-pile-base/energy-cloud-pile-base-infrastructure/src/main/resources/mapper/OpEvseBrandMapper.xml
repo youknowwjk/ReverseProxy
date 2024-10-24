@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.OpEvseBrandMapper">
+    <update id="deleteById" parameterType="Long">
+        update op_evse_brand
+        set deleted = 1
+        where id = #{id}
+    </update>
+
+
+    <select id="getModelListByBrandName" resultType="java.lang.String">
+            SELECT model.`product_model`
+            FROM `op_evse_brand` AS brand
+            LEFT JOIN `op_evse_brand_model` AS model
+            ON brand.`id` = model.`brand_id`
+            WHERE brand.`deleted` = 0
+            AND model.`deleted` = 0
+            AND brand.`name` = #{brandName};
+    </select>
+</mapper>

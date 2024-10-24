@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        p{
+            margin: 0;
+        }
+        .container {
+            position: relative;
+            padding: 30px 26px;
+            background: #fff;
+            max-width: 1080px;
+            margin: auto;
+        }
+
+
+        .t-1 {
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+            line-height: 22px;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .c-1 {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.9);
+            line-height: 18px;
+        }
+
+        .b-info {
+            margin-top: 14px;
+
+        }
+
+        .b-info .b-1 {
+            font-size: 13px;
+            color: #000000;
+            line-height: 18px;
+            margin-bottom: 2px;
+        }
+
+
+        .table-info {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            table-layout:fixed;
+            border-collapse:collapse;
+
+        }
+
+        .table-list{
+            min-width: 800px;
+            width: 100%;
+            table-layout:fixed
+        }
+
+        table tr th {
+            background: #f7f8fb;
+            color: rgba(0, 0, 0, 0.9);
+
+        }
+
+        table tr th span {
+            border-right: 1px solid #e5e5e5;
+            display: inline-block;
+            width: 100%;
+            line-height: 20px;
+        }
+
+        table tr th:not(:last-of-type) span {
+            border-right: 1px solid #e5e5e5;
+        }
+
+        table tr th,
+        table tr td {
+            line-height: 16px;
+            padding: 8px 16px 8px;
+            text-align: left;
+            font-size: 11px;
+        }
+
+        .table-bottom tr td{
+            padding: 8px 0 8px;
+        }
+
+        .bottom-tr td {
+            line-height: 16px;
+        }
+
+        .bottom-tr:not(:last-of-type) td {
+            padding-bottom: 8px;
+        }
+
+        .right-p>span,.right-p{
+            text-align: right;
+            padding-right: 20px;
+        }
+        .other-fee>span{
+            padding-left: 20px;
+        }
+
+    </style>
+</head>
+
+<body style="margin: 0;">
+<div class="container">
+    <img class="autel-logo"
+         src="https://s3.cn-northwest-1.amazonaws.com.cn/default.enetest/1570007484933443586-1563430574013796353-logo.png"
+         alt=""
+         style="height: 32px;margin: 0px 0 30px;"/>
+    <p class="t-1" id="invoiceNo">
+        <span>发票#:</span>
+        <span>00001</span>
+    </p>
+    <p class="c-1" id="invoiceDate">
+        <span>开票日期 :</span>
+        <span>2023-03-23(UTC-4)</span>
+    </p>
+    <div class="b-info">
+        <p class="b-1" id="billTo">发送给:</p>
+        <p class="b-1" id="customerName">
+            <span>商户名称:</span>
+            <span>道通合创</span>
+        </p>
+        <p class="b-1" id="customerAddress">
+            <span>商户地址:</span>
+            <span>36 Harbor Park DrivePark DrivePort Washington, NY 11050</span>
+        </p>
+        <p class="b-1" id="customerCountryCode">
+            <span>商户所处国家:</span>
+            <span>美国</span>
+        </p>
+        <p class="b-1" style="margin-top:14px;margin-bottom: 0;" id="vatNumber">
+            <span>VAT Number :</span>
+            <span>00001</span>
+        </p>
+    </div>
+    <div class="v-line" style="width: 100%;
+        height: 2px;
+        background: rgba(0, 0, 0, 0.6);
+        margin: 16px 0 19px;"></div>
+    <div class="table-info">
+        <p class="table-title" style="font-size: 13px;
+            color: #000000;
+            line-height: 18px;
+            margin-bottom: 11px;width: 800px;">
+            <span style=" margin-right: 26px;" id="orderId">订单编号:000001</span>
+            <span style=" margin-right: 26px;" id="paymentDate">付款日期:2023-03-23(UTC-4)</span>
+        </p>
+        <table aria-describedby="表头" class="table-list" id="dataTable">
+            <tbody>
+            <tr class="item-wrapper" id="tableTitle">
+                <th class="p-0-16">
+                    <span id="commodityName">项目</span>
+                </th>
+                <th class="p-0-16">
+                    <span id="subscriptionDuration">订阅周期</span>
+                </th>
+                <th class="p-0-16">
+                    <span id="portType">充电枪类型</span>
+                </th>
+                <th class="p-0-16">
+                    <span id="quantity">数量</span>
+                </th>
+                <th class="p-0-16 right-p">
+                    <span id="unitPrice">单价</span>
+                </th>
+                <th class="p-0-16 right-p">
+                    金额
+                </th>
+            </tr>
+            <tr class="t-li" id="orderDetail">
+
+                <td style="border-bottom: 1px solid #e5e5e5;">Evota Cloud Pro Plan</td>
+                <td style="border-bottom: 1px solid #e5e5e5;">3 years</td>
+                <td style="border-bottom: 1px solid #e5e5e5;">AC</td>
+                <td style="border-bottom: 1px solid #e5e5e5;">12</td>
+                <td style="border-bottom: 1px solid #e5e5e5;" class="right-p">$123</td>
+                <td style="border-bottom: 1px solid #e5e5e5;" class="right-p">$789</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <table aria-describedby="表头" class="table-bottom" id = "amountTable">
+        <th style="display: none"></th>
+        <tr class="bottom-tr">
+            <td colspan="3" style="padding-top: 13px;"></td>
+            <td   style="padding-top: 13px;">
+                <div class="other-fee">
+                    <span id="total">小计</span>
+                </div>
+            </td>
+            <td colspan="2" style="text-align: right; padding-right: 16px;padding-top: 13px;">
+                <span id="totalValue">$78212</span>
+            </td>
+        </tr>
+        <tr class="bottom-tr">
+            <td colspan="3"></td>
+            <td>
+                <div class="other-fee" >
+                    <span id="discount">折扣</span>
+                </div>
+            </td>
+            <td colspan="2" style="text-align: right; padding-right: 16px;">
+                <span id="discountValue">$78212</span>
+            </td>
+        </tr>
+        <tr class="bottom-tr" id="salesTaxLabel">
+            <td colspan="3"></td>
+            <td>
+                <div class="other-fee">
+                    <span id="salesTax">销售税</span>
+                </div>
+            </td>
+            <td colspan="2" style="text-align: right; padding-right: 16px;">
+                <span id="salesTaxValue">$7228</span>
+            </td>
+        </tr>
+        <tr class="bottom-tr" id="vatLabel">
+            <td colspan="3"></td>
+            <td>
+                <div class="other-fee">
+                    <span id="vat">增值税</span>
+                </div>
+            </td>
+            <td colspan="2" style="text-align: right; padding-right: 16px;">
+                <span id="vatTaxValue">$378</span>
+            </td>
+        </tr>
+        <tr class="bottom-tr">
+            <td colspan="3"></td>
+            <td>
+                <div class="other-fee" >
+                    <span id="totalTax">总税额</span>
+                </div>
+            </td>
+            <td colspan="2" style="text-align: right; padding-right: 16px;">
+                <span id="totalTaxValue">$378</span>
+            </td>
+        </tr>
+        <tr class="bottom-tr">
+            <td colspan="3"></td>
+            <td>
+                <div class="other-fee total-fee" style="font-size: 13px;font-weight: 500;">
+                    <span id="totalAmount">总计</span>
+                </div>
+            </td>
+            <td  colspan="2" style="text-align: right; padding-right: 16px;">
+                <div class="other-fee total-fee" style="font-size: 13px;font-weight: 500;">
+                    <span id="totalAmountValue">$3782223</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div class="v-line" style="width: 100%;height: 2px;background: rgba(0, 0, 0, 0.6);margin: 24px 0 17px;"></div>
+    <div class="footer-box" style="margin-top: 26px;color: #000000;">
+        <p class="title" style="font-size: 14px; font-weight: 500; line-height: 22px; margin-bottom: 6px;" id="companyName">公司全称</p>
+        <p class="name" style="font-size: 11px;line-height: 12px;" id="companyAddress">
+            36 Harbor Park DrivePark DrivePort Washington, NY 11050 Tel:
+            855-288-3578 Fax:651-375-330
+        </p>
+
+    </div>
+</div>
+</body>
+
+</html>

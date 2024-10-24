@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.OpLocationPileEvseMapper">
+
+    <insert id="batchSave">
+        insert into op_location_pile_evse(
+        `id`,
+        `created_at`,
+        `updated_at`,
+        `deleted`,
+        `status`,
+        `location_id`,
+        `pile_sn`,
+        `evse_list`,
+        `name`,
+        `product_model`,
+        `vendor`,
+        `brand_id`,
+        `default_charging_time`,
+        `public_mark`,
+        `eroaming_enable`
+        <!--待定 ,-->
+        <!--  `free_vend_enable`, -->
+       <!--  `free_vend_id_tag` -->
+        )
+        values
+        <foreach collection="insertList" item="it" separator=",">
+            (
+            #{it.id},
+            #{it.createdAt},
+            #{it.updatedAt},
+            #{it.deleted},
+            #{it.status},
+            #{it.locationId},
+            #{it.pileSn},
+            #{it.evseList},
+            #{it.name},
+            #{it.productModel},
+            #{it.vendor},
+            #{it.brandId},
+            #{it.defaultChargingTime},
+            #{it.publicMark},
+            #{it.eroamingEnable}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findByLocationIdAndPileName" resultType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpLocationPileEvseEntity">
+        SELECT
+        `id`,
+        `created_at`,
+        `updated_at`,
+        `deleted`,
+        `status`,
+        `location_id`,
+        `pile_sn`,
+        `evse_list`,
+        `name`,
+        `product_model`,
+        `vendor`,
+        `brand_id`
+        FROM `energy_pile_base`.`op_location_pile_evse`
+        <where>
+            deleted = 0
+            <if test="locationId != null and locationId > 0">
+                and location_id = #{locationId}
+            </if>
+            <if test="name != null and name !=''">
+                and name = #{name}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="queryPileListByOperationId" resultType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpLocationEvseEntity">
+        SELECT ev.id,ev.status,ev.location_id,ev.evse_sn
+        FROM  op_location_evse ev INNER JOIN op_location p   ON  ev.location_id = p.id
+        <where>
+            p.deleted = 0 and ev.deleted=0
+            <if test="operatorId != null and operatorId > 0">
+                and p.operator_id = #{operatorId}
+            </if>
+            <if test='list !=null'>
+                 and  ev.location_id  in
+                 <foreach collection="list" item="item" open="(" close=")" separator=","> #{item}</foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getLocationPileList" resultType="com.autel.cloud.pile.base.vo.PileDetailVO" >
+        select
+        l.id as locationId,
+        l.name as locationName,
+        p.id as pileId,
+        p.name as pileName,
+        p.evse_list as evseList,
+        p.pile_sn as pileSn
+        from op_location l
+        left join op_location_pile_evse p on l.id = p.location_id
+        where l.deleted = 0 and p.deleted = 0
+        <if test="locationIds != null and locationIds.size() > 0">
+            and l.id in
+            <foreach collection="locationIds" open="(" close=")" item="it" separator=",">
+                #{it}
+            </foreach>
+        </if>
+        <if test="keyword != null and keyword != '' ">
+            and (l.name like concat('%',#{keyword},'%') or p.name like concat('%',#{keyword},'%'))
+        </if>
+    </select>
+    <select id="findOne"
+            resultType="com.autel.cloud.pile.base.infrastructure.mapper.entity.OpLocationPileEvseEntity">
+        select * from op_location_pile_evse where pile_sn = #{pileSn} and deleted = 0
+    </select>
+
+    <update id="deleteByPileSN" parameterType="java.lang.String">
+        update op_location_pile_evse
+        set deleted = 1
+        where pile_sn = #{pileSN}
+    </update>
+
+</mapper>

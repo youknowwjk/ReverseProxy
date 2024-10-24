@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.ChargeCardMapper">
+    <insert id="saveBatch">
+        insert into tb_charge_card (`id`, `card_number`, `card_type`, `operator_id`, `card_attribute`, `bind_status`,
+        `user_id`, `bind_time`, `card_alias`, `limit_location_id`, `limit_evse_id`,
+        `deleted`, `create_time`, `update_time`)
+        values
+        <foreach collection="insertList" item="e" separator=",">
+            (
+            #{e.id},
+            #{e.cardNumber},
+            #{e.cardType},
+            #{e.operatorId},
+            #{e.cardAttribute},
+            #{e.bindStatus},
+            #{e.userId},
+            #{e.bindTime},
+            #{e.cardAlias},
+            #{e.limitLocationId},
+            #{e.limitEvseId},
+            #{e.deleted},
+            #{e.createTime},
+            #{e.updateTime}
+            )
+        </foreach>
+    </insert>
+    <update id="updateBatchByCardNumber" parameterType="list">
+        update tb_charge_card
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="operator_id =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.operatorId !=null ">
+                        when card_number = #{item.cardNumber}
+                        then #{item.operatorId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="card_type =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.cardType !=null ">
+                        when card_number = #{item.cardNumber}
+                        then #{item.cardType}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="update_time =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.updateTime !=null ">
+                        when card_number = #{item.cardNumber}
+                        then #{item.updateTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="create_time =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.createTime !=null ">
+                        when card_number = #{item.cardNumber}
+                        then #{item.createTime}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where
+        operator_id is null
+        and deleted = 0
+        and user_id is null
+        and card_number in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item.cardNumber}
+        </foreach>
+    </update>
+
+    <select id="pagesForBusiness" resultType="com.autel.cloud.pile.base.vo.ChargeCardBusinessVO">
+        SELECT
+        cc.id,
+        cc.card_number,
+        cc.card_type,
+        cc.card_brand,
+        cc.charge_times,
+        cc.bind_status,
+        cc.bind_time,
+        cc.create_time,
+        cc.user_id,
+        cc.operator_id,
+        cc.operator_name,
+        cc.limit_location_id,
+        cc.limit_evse_id
+        FROM
+        tb_charge_card cc
+        <where>
+            cc.deleted = 0
+            <if test="params.cardNumber != null">
+                and cc.card_number like CONCAT('%',#{params.cardNumber},'%')
+            </if>
+            <if test="params.operatorName != null">
+                and cc.operator_name like CONCAT('%',#{params.operatorName},'%')
+            </if>
+            <if test="params.bindStartDate != null ">
+                and cc.bind_time &gt;= #{params.bindStartDate}
+            </if>
+            <if test="params.bindEndDate != null ">
+                and cc.bind_time &lt;= #{params.bindEndDate}
+            </if>
+            <if test="params.createStartDate != null ">
+                and cc.create_time &gt;= #{params.createStartDate}
+            </if>
+            <if test="params.createEndDate != null ">
+                and cc.create_time &lt;= #{params.createEndDate}
+            </if>
+            <if test="params.bindStatus != null ">
+                and cc.bind_status = #{params.bindStatus}
+            </if>
+            <if test="params.cardType != null ">
+                and cc.card_type = #{params.cardType}
+            </if>
+            <if test="params.operatorId != null and params.operatorId != 0">
+                and cc.operator_id = #{params.operatorId}
+            </if>
+        </where>
+        order by cc.id desc
+    </select>
+    <select id="countAll" resultType="java.lang.Integer">
+        select count(1)
+        from `pile_member`.`t_electric_card` where deleted = 0 and card_number is not null
+    </select>
+    <select id="selectByBatch" resultType="com.autel.cloud.pile.base.dto.CardOldDTO">
+        SELECT ec.`id`,
+        ec.`card_number` as cardNumber,
+        if(ec.`card_type` = 'RFID', 0, 1) as cardType,
+        ec.`seller_id` as operatorId,
+        if(ec.`card_attribute` = '指定场站', 1, 0) as cardAttribute,
+        ec.`bind_status` as bindStatus,
+        m.`open_id` as userId,
+        UNIX_TIMESTAMP(ec.`bind_time`) * 1000 as bindTime,
+        ec.`another_name` as cardAlias,
+        ec.`available_station_id` as limitLocationId,
+        ec.`available_pile_id` as limitEvseId,
+        ec.`deleted` as deleted,
+        UNIX_TIMESTAMP(ec.`create_time`) * 1000 as createTime,
+        UNIX_TIMESTAMP(ec.`update_time`) * 1000 as updateTime
+        FROM `pile_member`.`t_electric_card` AS ec
+        LEFT JOIN `pile_member`.`t_member` AS m ON m.id = ec.member_id
+        where ec.`deleted` = 0 and ec.`card_number` is not null
+        <if test="cardNumbers != null and cardNumbers.size > 0">
+            and ec.`card_number` in
+            <foreach collection="cardNumbers" item="it" open="(" close=")" separator=",">
+                '${it}'
+            </foreach>
+        </if>
+        <if test="page != null and size != null">
+            limit #{page},#{size}
+        </if>
+    </select>
+    <select id="pagesV2" resultType="com.autel.cloud.pile.base.vo.ChargeCardPageVO">
+        SELECT
+        cc.id,
+        cc.card_number,
+        cc.card_type,
+        cc.card_brand,
+        cc.charge_times,
+        cc.bind_status,
+        cc.bind_time,
+        card_alias,
+        cc.user_id,
+        cc.start_multiple_orders_enabled
+        FROM
+        tb_charge_card cc
+        <where>
+            cc.deleted = 0 and cc.user_id is not null
+            <if test="params.keyWord != null and params.keyWord != '' ">
+                and (LOCATE(#{params.keyWord}, `card_number`) > 0 or LOCATE(#{params.keyWord}, `card_alias`) > 0 or LOCATE(#{params.keyWord}, `user_id`) > 0)
+            </if>
+            <if test="params.bindStartDate != null ">
+                and cc.bind_time &gt;= #{params.bindStartDate}
+            </if>
+            <if test="params.bindEndDate != null ">
+                and cc.bind_time &lt;= #{params.bindEndDate}
+            </if>
+            <if test="params.operatorId != null and params.operatorId != 0">
+                and cc.operator_id = #{params.operatorId}
+            </if>
+            <if test="params.bindStatus != null">
+                and cc.bind_status = #{params.bindStatus}
+            </if>
+            <if test="list != null and list.size() > 0">
+                and cc.user_id in
+                 <foreach collection="list" item="it" open="(" close=")" separator=",">
+                #{it}
+            </foreach>
+            </if>
+        </where>
+        order by
+        CONVERT(${params.orderBy} USING GBK) COLLATE gbk_chinese_ci ${params.orderType},cc.id ASC
+    </select>
+
+
+    <select id="cardOptionPageList" resultType="com.autel.cloud.pile.base.vo.CardOptionsPageVO">
+        SELECT
+        cc.id,
+        cc.card_number,
+        cc.bind_status,
+        card_alias
+        FROM
+        tb_charge_card cc
+        <where>
+            cc.deleted = 0
+            <if test="keyWord != null">
+                and (LOCATE(#{keyWord}, `card_number`) > 0 or LOCATE(#{keyWord}, `card_alias`) > 0)
+            </if>
+            <if test="operatorId != null and operatorId != 0">
+                and cc.operator_id = #{operatorId}
+            </if>
+        </where>
+        order by id desc
+    </select>
+</mapper>

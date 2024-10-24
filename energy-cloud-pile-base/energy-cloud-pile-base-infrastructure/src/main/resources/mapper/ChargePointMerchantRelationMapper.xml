@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.ChargePointMerchantRelationMapper">
+
+    <select id="existsPowerTypes" resultType="java.lang.String">
+            SELECT distinct power_type from charge_point_merchant_relation WHERE merchant_id = #{merchantId}
+    </select>
+
+    <select id="getConnectors" resultType="java.lang.String">
+        SELECT connectors from charge_point_merchant_relation WHERE sn = #{sn} order by id desc limit 1
+    </select>
+
+    <select id="getPage" resultType="com.autel.cloud.pile.base.vo.ChargePointAssetVO">
+        SELECT
+        pile.`id` AS id,
+        pile.`brand_id` AS brandId,
+        pile.`brand_name` AS brandName,
+        pile.`name` AS name,
+        pile.`sn` AS sn,
+        pile.`pin` AS pin,
+        pile.`power_type` AS powerType,
+        pile.`overcharging_pile_flag` AS overchargingPileFlag
+        FROM
+        `charge_point_merchant_relation` AS pile
+        LEFT JOIN
+        `charge_point_merchant_terminal` AS terminal
+        ON
+        pile.`sn` = terminal.`host_sn`
+        AND
+        terminal.`merchant_id` = #{merchantId}
+        WHERE
+        pile.`merchant_id` = #{merchantId}
+        <if test="params.keyword != null and params.keyword != '' ">
+            AND (pile.`sn` LIKE concat('%',#{params.keyword},'%')
+            OR   pile.`name` LIKE concat('%',#{params.keyword},'%')
+            OR   terminal.`terminal_sn` LIKE concat('%',#{params.keyword},'%')
+            OR   terminal.`terminal_name` LIKE concat('%',#{params.keyword},'%')
+            )
+        </if>
+        <if test="params.powerType != null and params.powerType != '' ">
+            AND pile.`power_type` = #{params.powerType}
+        </if>
+        <if test="params.subscriptionStatus != null">
+            AND pile.`sub_status` = #{params.subscriptionStatus}
+        </if>
+        GROUP BY pile.`id`
+        ORDER BY
+        <choose>
+            <when test="params.orderBy == 'name' and params.orderType != null and params.orderType != '' ">
+                ${params.orderBy} ${params.orderType}
+            </when>
+            <otherwise>pile.`bind_time` DESC, pile.`id` DESC</otherwise>
+        </choose>
+    </select>
+
+    <select id="selectPageByCustomer" parameterType="com.autel.cloud.pile.base.dto.ChargePointFuzzQueryDTO" resultType="com.autel.cloud.pile.base.infrastructure.mapper.entity.ChargePointMerchantRelationEntity">
+        SELECT
+        r.*, l.NAME as location_name
+        FROM
+        charge_point_merchant_relation r
+        left JOIN op_location_pile_evse p ON r.sn = p.pile_sn and p.deleted = 0
+        left JOIN op_location l ON p.location_id = l.id and l.deleted = 0 and l.operator_id = #{params.merchantId}
+        WHERE
+        r.merchant_id = #{params.merchantId}
+        <if test="params.keyword != null and params.keyword != '' and (params.hostSnList == null or params.hostSnList.size() == 0)">
+            AND ( r.NAME LIKE concat('%',#{params.keyword},'%') OR r.sn LIKE concat('%',#{params.keyword},'%') OR r.product_name_pdm LIKE concat('%',#{params.keyword},'%') )
+        </if>
+
+        <if test="params.keyword != null and params.keyword != '' and params.hostSnList != null and params.hostSnList.size() != 0">
+            AND ( r.NAME LIKE concat('%',#{params.keyword},'%') OR r.sn LIKE concat('%',#{params.keyword},'%') OR r.product_name_pdm LIKE concat('%',#{params.keyword},'%')
+            OR
+            r.sn in
+            <foreach collection="params.hostSnList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+
+        <if test="params.powerType != null and params.powerType != ''">
+            AND r.power_type = #{params.powerType}
+        </if>
+        <if test="params.subscriptionStatus != null and params.subscriptionStatus != ''">
+            AND r.sub_status = #{params.subscriptionStatus}
+        </if>
+      <!--  <if test="params.hostSnList != null and params.hostSnList.size() > 0">
+            AND r.sn in
+            <foreach collection="params.hostSnList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>-->
+
+        <if test="params.locations != null and params.locations.size() > 0 and params.snByLocationIdList != null and params.snByLocationIdList.size() > 0">
+            AND r.sn in
+            <foreach collection="params.snByLocationIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params.locations != null and params.locations.size() > 0 and (params.snByLocationIdList == null || params.snByLocationIdList.size() == 0)">
+            and 0
+        </if>
+        GROUP BY
+        r.sn
+        ORDER BY
+        l.NAME ASC
+    </select>
+
+    <select id="selectByOrder" parameterType="com.autel.cloud.pile.base.dto.ChargePointFuzzQueryDTO" resultType="com.autel.cloud.pile.base.infrastructure.mapper.entity.ChargePointMerchantRelationEntity">
+        SELECT
+            t.*, t.connectors as connectors_string
+        FROM
+            ( SELECT r.* FROM charge_point_merchant_relation r WHERE r.merchant_id = #{params.merchantId} ) t
+            LEFT JOIN (
+        SELECT
+            l.pile_sn,
+            l.STATUS,
+            max( l.unavailable_time ) unavailable_time
+        FROM
+            tb_len_bind_relation l
+        WHERE
+            l.goods_id = #{params.commodityCode}
+            and l.tenant_id = #{params.merchantId}
+        GROUP BY
+            l.pile_sn
+            ) t2 ON t.sn = t2.pile_sn
+            where 1=1
+        <if test="params.keyword != null and params.keyword != '' and (params.hostSnList == null or params.hostSnList.size() == 0) ">
+            AND ( t.NAME LIKE concat('%',#{params.keyword},'%') OR t.sn LIKE concat('%',#{params.keyword},'%') OR t.product_name_pdm LIKE concat('%',#{params.keyword},'%') )
+        </if>
+
+        <if test="params.keyword != null and params.keyword != '' and params.hostSnList != null and params.hostSnList.size() != 0">
+            AND ( t.NAME LIKE concat('%',#{params.keyword},'%') OR t.sn LIKE concat('%',#{params.keyword},'%') OR t.product_name_pdm LIKE concat('%',#{params.keyword},'%')
+             OR
+            t.sn in
+            <foreach collection="params.hostSnList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+             )
+        </if>
+
+        <if test="params.powerType != null and params.powerType != ''">
+            AND t.power_type = #{params.powerType}
+        </if>
+        <if test="params.subscriptionStatus != null and params.subscriptionStatus != ''">
+            AND t.sub_status = #{params.subscriptionStatus}
+        </if>
+        <if test="params.locations != null and params.locations.size() > 0 and params.snByLocationIdList != null and params.snByLocationIdList.size() > 0">
+            AND t.sn in
+            <foreach collection="params.snByLocationIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params.locations != null and params.locations.size() > 0 and (params.snByLocationIdList == null || params.snByLocationIdList.size() == 0)">
+            and 0
+        </if>
+        ORDER BY
+        CASE
+            WHEN t2.status = 2 THEN 0
+            WHEN t2.status = 1 THEN 1
+            WHEN t2.status = 0 THEN 0
+            WHEN t2.status IS NULL THEN 0
+            ELSE 0
+            END asc,
+        t2.unavailable_time ASC,
+        t.ID ASC
+    </select>
+
+    <select id="queryPileBySn" resultType="com.autel.cloud.pile.base.vo.PileBaseVO">
+        select p.id,p.name,p.sn,p.power_type,p.phases
+        from charge_point_merchant_relation p
+        where p.merchant_id=#{paramDTO.operatorId}
+        <foreach collection="paramDTO.snList" item="it" open=" and p.sn in (" close=")" separator=",">
+            #{it}
+        </foreach>
+        order by p.id desc
+    </select>
+</mapper>
