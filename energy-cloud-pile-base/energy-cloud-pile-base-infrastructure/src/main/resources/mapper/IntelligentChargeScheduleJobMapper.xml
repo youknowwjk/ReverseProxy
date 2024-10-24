@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.autel.cloud.pile.base.infrastructure.mapper.IntelligentChargeScheduleJobMapper">
-
-    <update id="updateFinishedJob">
-         update intelligent_charge_schedule_job set status = -3  where evse_sn = #{evseSn} and id != #{orderSeq} and status >= 0 and status != 5;
-    </update>
-
-</mapper>
